@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Todo</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <% const quadrants = [
+        { title: "Do", subtitle: "Urgent + Important", matches: (task) => task.isUrgent && task.isImportant },
+        { title: "Schedule", subtitle: "Not Urgent + Important", matches: (task) => !task.isUrgent && task.isImportant },
+        { title: "Delegate", subtitle: "Urgent + Not Important", matches: (task) => task.isUrgent && !task.isImportant },
+        { title: "Eliminate", subtitle: "Not Urgent + Not Important", matches: (task) => !task.isUrgent && !task.isImportant }
+    ]; %>
+
+    <main class="container">
+        <header class="page-header">
+            <div>
+                <h1>Eisenhower Todo</h1>
+                <p>Organize your tasks by urgency and importance.</p>
+            </div>
+            <a class="primary-link" href="/tasks/new">Add New Task</a>
+        </header>
+
+        <section class="matrix" aria-label="Eisenhower matrix">
+            <% quadrants.forEach(quadrant => { %>
+                <% const quadrantTasks = tasks.filter(quadrant.matches); %>
+                <section class="quadrant">
+                    <div class="quadrant-heading">
+                        <div>
+                            <h2><%= quadrant.title %></h2>
+                            <p><%= quadrant.subtitle %></p>
+                        </div>
+                        <span class="task-count"><%= quadrantTasks.length %></span>
+                    </div>
+
+                    <% if (quadrantTasks.length === 0) { %>
+                        <p class="empty-state">No tasks here.</p>
+                    <% } %>
+
+                    <% quadrantTasks.forEach(task => { %>
+                        <article class="task">
+                            <h3><%= task.title %></h3>
+                            <% if (task.description) { %>
+                                <p><%= task.description %></p>
+                            <% } %>
+                            <% if (task.createdAt) { %>
+                                <p class="created-date">Created: <%= new Date(task.createdAt).toLocaleDateString("en-IN") %></p>
+                            <% } %>
+                            <% if (task.updatedAt) { %>
+                                <p class="updated-date">Last updated: <%= new Date(task.updatedAt).toLocaleDateString("en-IN") %></p>
+                            <% } %>
+                            <% if (task.dueDate) { %>
+                                <p class="due-date">Due: <%= task.dueDate %></p>
+                            <% } %>
+                            <div class="task-actions">
+                                <a class="edit-link" href="/tasks/<%= task._id %>/edit">Edit</a>
+                                <form action="/tasks/<%= task._id %>/delete" method="POST">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </article>
+                    <% }) %>
+                </section>
+            <% }) %>
+        </section>
+    </main>
+</body>
+</html>
